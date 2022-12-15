@@ -1,4 +1,5 @@
 const path = require('path');
+const RefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 
 module.exports = {
   name: 'wordrelay-setting',
@@ -16,11 +17,21 @@ module.exports = {
       loader: 'babel-loader',
       options: {
         presets: ['@babel/preset-env', '@babel/preset-react'],
+        plugins: ['react-refresh/babel'],
       }
-    }]
+    }],
   },
+  plugins: [
+    new RefreshWebpackPlugin(),
+  ],
   output: { // 출력
     path: path.join(__dirname, 'dist'),
-    filename: 'app.js'
+    filename: 'app.js',
+    publicPath: '/dist/',
   },
+  devServer: {
+    devMiddleware: { publicPath: '/dist' },
+    static: { directory: path.resolve(__dirname) },
+    hot: true,
+  }
 };

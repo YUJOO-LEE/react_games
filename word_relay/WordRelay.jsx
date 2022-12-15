@@ -2,7 +2,7 @@ import React from 'react';
 
 function WordRelay() {
   return (
-    <div>WordRelay</div>
+    <div>WordRelay2</div>
   )
 }
 
