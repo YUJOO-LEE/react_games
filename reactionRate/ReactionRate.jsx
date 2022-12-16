@@ -1,31 +1,34 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
+import RenderResult from './RenderResult';
 
-let setTimer;
 const STATE_TYPE = {
-  WAITING: {id: 'waiting', message: '클릭해서 시작하세요.', startTime: null},
-  START: {id: 'start', message: '초록색으로 바뀌면 클릭하세요.', startTime: null},
+  WAITING: {id: 'waiting', message: '클릭해서 시작하세요.'},
+  START: {id: 'start', message: '초록색으로 바뀌면 클릭하세요.'},
   CLICK: {id: 'click', message: '클릭!'},
-  ERROR: {id: 'error', message: '성급하시네요!', startTime: null}
+  ERROR: {id: 'error', message: '성급하시네요!'}
 }
 
 const ReactionRate = () => {
   const [State, setState] = useState(STATE_TYPE.WAITING);
   const [Result, setResult] = useState([]);
+  const setTimer = useRef(null);
+  const startTime = useRef(null);
 
   const timer = () => {
-    setState({...STATE_TYPE.CLICK, startTime: new Date});
+    setState(STATE_TYPE.CLICK);
+    startTime.current = new Date();
   }
 
   const handleClick = () => {
     if (State.id === 'waiting') {
       setState(STATE_TYPE.START);
-      setTimer = setTimeout(timer, Math.random() * 5 + 1000);
+      setTimer.current = setTimeout(timer, Math.random() * 3000 + 1000);
     } else if (State.id === 'start') {
       setState(STATE_TYPE.ERROR);
-      clearTimeout(setTimer);
+      clearTimeout(setTimer.current);
     } else if (State.id === 'click') {
-      const curDate = new Date;
-      const time = curDate - State.startTime;
+      const curDate = new Date();
+      const time = curDate - startTime.current;
       setResult(prev => [...prev, time]);
       setState(STATE_TYPE.WAITING);
     } else if (State.id === 'error') {
@@ -41,11 +44,8 @@ const ReactionRate = () => {
       >
         {State.message}
       </div>
-      {Result.length > 0 && 
-        <>
-        <p>평균 시간 : {Math.floor(Result.reduce((a, c) => a + c) / Result.length)} ms</p>
-        <ul>{Result.map(time => <li key={'time' + time}>{time}ms</li>)}</ul>
-        </>
+      {Result.length > 0 &&
+        <RenderResult result={Result} />
       }
     </>
   )

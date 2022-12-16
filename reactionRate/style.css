@@ -10,7 +10,7 @@
 }
 
 .waiting{
-  background-color: lightblue;
+  background-color: gray;
 }
 
 .start{
@@ -22,7 +22,7 @@
 }
 
 .error{
-  background-color: lightyellow;
+  background-color: lightblue;
 }
 
 p{
