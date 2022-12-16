@@ -1,4 +1,28 @@
 import React, { useEffect, useState } from 'react';
+import Try from './Try';
+
+const checkValue = (value) => {
+  if (value.length !== 4 || (/[^0-9]/g).test(value)) {
+    return '4자리 숫자를 입력하세요.';
+  }
+  return '';
+}
+
+const checkGame = (value, answer) => {
+  const valueArr = value.split('').map(v => parseInt(v));
+  let strike = 0;
+  let ball = 0;
+  
+  for (let i = 0; i < valueArr.length; i++) {
+    if (valueArr[i] === answer[i]) {
+      strike += 1;
+    } else if (answer.includes(valueArr[i])) {
+      ball += 1;
+    }
+  }
+
+  return {strike: strike, ball: ball};
+}
 
 function BaseBall() {
   const [Answer, setAnswer] = useState([]);
@@ -17,18 +41,13 @@ function BaseBall() {
     getAnswer();
   }
   
-  const checkValue = () => {
-    if (Value.length !== 4 || (/[^0-9]/g).test(Value)) {
-      setError('4자리 숫자를 입력하세요.');
-      return false;
-    }
-    setError('');
-    return true;
-  }
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (!checkValue()) return;
+
+    const checkValueMsg = checkValue(Value);
+    setError(checkValueMsg);
+    if (checkValueMsg) return;
 
     if (Log.length >= 10) {
       setResult('게임을 다시 시작합니다.');
@@ -37,26 +56,15 @@ function BaseBall() {
     }
 
     if (Value === Answer.join('')) {
-      setResult(Value + '정답!');
+      setResult(Value + ' 홈런! 게임을 다시 시작합니다.');
       clearGame();
       return;
     }
 
-    const valueArr = Value.split('').map(v => parseInt(v));
-    let strike = 0;
-    let ball = 0;
-    
-    for (let i = 0; i < valueArr.length; i++) {
-      if (valueArr[i] === Answer[i]) {
-        strike += 1;
-      } else if (Answer.includes(valueArr[i])) {
-        ball += 1;
-      }
-    }
-
+    const {strike, ball} = checkGame(Value, Answer);
     setResult(`${strike} 스트라이크, ${ball} 볼!`);
     setLog(prev => 
-      [...prev, `${prev.length + 1}번째 시도, [${Value}] ${strike}/${ball}`]);
+      [...prev, {count: prev.length + 1, value: Value, score: `${strike}/${ball}`}]);
     
     if (Log.length >= 9) {
       setResult(prev => prev + ' 실패했습니다.');
@@ -91,7 +99,9 @@ function BaseBall() {
       </form>
       {Error && <p>{Error}</p>}
       <ul>
-        {Log.map((v, i) => (<li key={i}>{v}</li>))}
+        {Log.map((v) => (
+          <Try key={v.count + v.value} count={v.count} value={v.value} score={v.score} />
+        ))}
       </ul>
     </div>
   )
