@@ -12,6 +12,11 @@ const RPS = () => {
   const game = useRef(null);
 
   const handleClick = (selected) => () => {
+    if (Result) {
+      setResult('');
+      return;
+    }
+
     clearInterval(game.current);
     const diff = scores[selected] - scores[Computer];
     if (diff === 0) {
@@ -24,6 +29,8 @@ const RPS = () => {
   }
 
   useEffect(() => {
+    if (Result) return;
+
     game.current = setInterval(()=>{
       setComputer(prev => {
         if (prev === '가위') return '바위'
@@ -35,7 +42,7 @@ const RPS = () => {
     return () => {
       clearInterval(game.current);
     };
-  }, [])
+  }, [Result])
 
   return (
     <div>
