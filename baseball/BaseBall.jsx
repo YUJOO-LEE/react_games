@@ -1,5 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Try from './Try';
+
+const getAnswer = () => {
+  const arr = new Array(10).fill(0).map((_, i) => i);
+  const answer = [];
+
+  while (answer.length < 4) {
+    const randomNum = Math.floor(Math.random() * arr.length);
+    answer.push(arr[randomNum]);
+    arr.splice(randomNum, 1);
+  }
+  
+  return answer;
+}
 
 const checkValue = (value) => {
   if (value.length !== 4 || (/[^0-9]/g).test(value)) {
@@ -25,12 +38,12 @@ const checkGame = (value, answer) => {
 }
 
 function BaseBall() {
-  const [Answer, setAnswer] = useState([]);
+  const [Answer, setAnswer] = useState(getAnswer);
   const [Result, setResult] = useState('');
   const [Value, setValue] = useState('');
   const [Log, setLog] = useState([]);
   const [Error, setError] = useState('');
-  
+
   const onInput = (e) => {
     setValue(e.target.value);
   }
@@ -38,9 +51,8 @@ function BaseBall() {
   const clearGame = () => {
     setLog([]);
     setValue('');
-    getAnswer();
+    setAnswer(getAnswer());
   }
-  
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -70,23 +82,6 @@ function BaseBall() {
       setResult(prev => prev + ' 실패했습니다.');
     }
   }
-
-  const getAnswer = () => {
-    const arr = new Array(10).fill(0).map((_, i) => i);
-    const answer = [];
-
-    while (answer.length < 4) {
-      const randomNum = Math.floor(Math.random() * arr.length);
-      answer.push(arr[randomNum]);
-      arr.splice(randomNum, 1);
-    }
-
-    setAnswer(answer);
-  }
-
-  useEffect(() => {
-    getAnswer();
-  }, [])
 
   return (
     <div>
