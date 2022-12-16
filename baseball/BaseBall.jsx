@@ -37,7 +37,7 @@ const checkGame = (value, answer) => {
   return {strike: strike, ball: ball};
 }
 
-function BaseBall() {
+const BaseBall = () => {
   const [Answer, setAnswer] = useState(getAnswer);
   const [Result, setResult] = useState('');
   const [Value, setValue] = useState('');
