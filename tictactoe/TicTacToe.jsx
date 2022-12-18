@@ -43,10 +43,6 @@ const TicTacToe = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const {tableData, recentCell, winner, turn, end} = state;
 
-  const setWin = useCallback(() => {
-    dispatch({ type: 'SET_WINNER', winner: state.turn });
-  }, [])
-
   useEffect(() => {
     const [row, cell] = recentCell;
     if (row < 0) return;
@@ -63,7 +59,7 @@ const TicTacToe = () => {
     }
 
     if (isWin) {
-      setWin();
+      dispatch({ type: 'SET_WINNER', winner: state.turn });
       dispatch({ type: 'END' });
     } else {
       let all = true;
@@ -82,8 +78,6 @@ const TicTacToe = () => {
       }
     }
   }, [recentCell]);
-
-  console.log(state);
 
   return (
     <>
