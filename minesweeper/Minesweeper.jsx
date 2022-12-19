@@ -9,23 +9,28 @@ export const tableContext = createContext({
 
 export const ACTION = {
   START_GAME: 'START_GAME',
+  OPEN_CELL: 'OPEN_CELL',
+  CLICK_MINE: 'CLICK_MINE',
+  FLAG_QUESTION: 'FLAG_QUESTION',
+  NORMALIZE: 'NORMALIZE',
 }
 
 export const CODE = {
-  OPEND: 0,
+  OPENED: 0,
   NORMAL: -1,
-  MINE: -7,
   FLAG: -2,
   QUESTION: -3,
-  FLAG_MINE: -4,
-  QUESTION_MINE: -5,
-  OPEND_MIND: -6,
+  MINE: -11,
+  FLAG_MINE: -12,
+  QUESTION_MINE: -13,
+  OPENED_MIND: -20,
 }
 
 const initialState = {
   tableData: [],
   timer: 0,
-  result: ''
+  result: '',
+  halted: false
 }
 
 const plantMine = (row, cell, mine) => {
@@ -59,8 +64,106 @@ const reducer = (state, action) => {
     case ACTION.START_GAME: 
       return {
         ...state,
-        tableData: plantMine(action.row, action.cell, action.mine)
+        tableData: plantMine(action.row, action.cell, action.mine),
+        halted: false,
       }
+      
+    case ACTION.OPEN_CELL: {
+      const tableData = [...state.tableData];
+      tableData[action.row] = [...state.tableData[action.row]];
+
+      const checkCell = (row, cell) => {
+        let around = [];
+        if (tableData[row - 1]) {
+          around = around.concat(
+            tableData[row - 1][cell - 1],
+            tableData[row - 1][cell],
+            tableData[row - 1][cell + 1],
+          )
+        }
+        if (tableData[row + 1]) {
+          around = around.concat(
+            tableData[row + 1][cell - 1],
+            tableData[row + 1][cell],
+            tableData[row + 1][cell + 1],
+          )
+        }
+        around = around.concat(
+          tableData[row][cell - 1],
+          tableData[row][cell + 1],
+        )
+
+        const count = around.filter(v => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+        tableData[row][cell] = count;
+
+        if (count === 0) {
+          const around = [];
+          if (tableData[row - 1]) {
+            around.push(
+              [row - 1, cell - 1],
+              [row - 1, cell],
+              [row - 1, cell + 1],
+            );
+          }
+          if (tableData[row + 1]) {
+            around.push(
+              [row + 1, cell - 1],
+              [row + 1, cell],
+              [row + 1, cell + 1],
+            );
+          }
+          around.push(
+            [row, cell - 1],
+            [row, cell + 1],
+          );
+          around
+            .filter(v => tableData[v[0]][v[1]])
+            .forEach(v => {
+              if (![CODE.OPENED, CODE.OPENED_MIND].includes(tableData[v[0]][v[1]])) {
+                checkCell(v[0], v[1]);
+              }
+            });
+        }
+      }
+      checkCell(action.row, action.cell);
+
+      return {
+        ...state,
+        tableData
+      }
+    }
+    
+    case ACTION.CLICK_MINE:{
+      const tableData = [...state.tableData];
+      tableData[action.row] = [...state.tableData[action.row]];
+      tableData[action.row][action.cell] = CODE.OPENED_MIND;
+      return {
+        ...state,
+        tableData,
+        halted: true
+      }
+    }
+
+    case ACTION.FLAG_QUESTION:{
+      const tableData = [...state.tableData];
+      tableData[action.row] = [...state.tableData[action.row]];
+      tableData[action.row][action.cell] -= 1;
+      return {
+        ...state,
+        tableData
+      }
+    }
+
+    case ACTION.NORMALIZE:{
+      const tableData = [...state.tableData];
+      tableData[action.row] = [...state.tableData[action.row]];
+      tableData[action.row][action.cell] += 2;
+      return {
+        ...state,
+        tableData
+      }
+    }
+
     default: 
       return state
   }
@@ -68,8 +171,8 @@ const reducer = (state, action) => {
 
 const Minesweeper = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const {tableData, timer, result} = state;
-  const value = useMemo(() => ({ tableData, dispatch }), [tableData], []);
+  const {tableData, timer, result, halted} = state;
+  const value = useMemo(() => ({ tableData, dispatch, halted }), [tableData, halted]);
 
   return (
     <tableContext.Provider value={value}>
