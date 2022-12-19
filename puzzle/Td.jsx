@@ -12,7 +12,7 @@ const Td = memo(({ rowIndex, cellIndex }) => {
 
   return useMemo(() => (
     <td onClick={handleClickTd}>
-      {tableData[rowIndex][cellIndex]}
+      {tableData[rowIndex][cellIndex] || ''}
     </td>
   ), [isWin, tableData[rowIndex][cellIndex]])
 })
