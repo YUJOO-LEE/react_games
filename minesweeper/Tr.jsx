@@ -1,12 +1,16 @@
-import React from 'react';
+import React, { memo } from 'react';
 import Td from './Td';
 
-const Tr = () => {
+const Tr = memo(({ trData }) => {
   return (
     <tr>
-      <Td />
+      {trData.map((td, i) => {
+        return (
+          <Td key={'td' + i} tdData={td} />
+        )
+      })}
     </tr>
   )
-}
+})
 
 export default Tr;

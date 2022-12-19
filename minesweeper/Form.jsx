@@ -1,25 +1,29 @@
-import React, { useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
+import { ACTION, tableContext } from './Minesweeper';
 
 const Form = () => {
   const [RowLength, setRowLength] = useState(10);
   const [CellLength, setCellLength] = useState(10);
   const [Mine, setMine] = useState(20);
+  const { dispatch } = useContext(tableContext);
 
-  const onInputRow = (e) => {
+  const onInputRow = useCallback((e) => {
     setRowLength(e.target.value);
-  }
+  }, []);
 
-  const onInputCell = (e) => {
+  const onInputCell = useCallback((e) => {
     setCellLength(e.target.value);
-  }
+  }, []);
 
-  const onInputMine = (e) => {
+  const onInputMine = useCallback((e) => {
     setMine(e.target.value);
-  }
+  }, []);
 
-  const onSubmit = (e) => {
+  const onSubmit = useCallback((e) => {
     e.preventDefault();
-  }
+
+    dispatch({ type: ACTION.START_GAME, row: RowLength, cell: CellLength, mine: Mine});
+  }, [RowLength, CellLength, Mine]);
 
   return (
     <form onSubmit={onSubmit}>
