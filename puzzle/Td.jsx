@@ -3,18 +3,20 @@ import { ACTION, tableContext } from './Puzzle';
 
 const Td = memo(({ rowIndex, cellIndex }) => {
   const { tableData, dispatch, isWin } = useContext(tableContext);
+  const tdData = tableData[rowIndex][cellIndex];
 
   const handleClickTd = useCallback(() => {
-    if (!isWin && tableData[rowIndex][cellIndex]) {
+    if (!isWin && tdData) {
       dispatch({ type: ACTION.CLICK_CELL, row: rowIndex, cell: cellIndex })
     }
-  }, [isWin, tableData[rowIndex][cellIndex]]);
+  }, [isWin, tdData]);
 
-  return useMemo(() => (
+  return useMemo(() => {
+    return (
     <td onClick={handleClickTd}>
-      {tableData[rowIndex][cellIndex] || ''}
+      {tdData || ''}
     </td>
-  ), [isWin, tableData[rowIndex][cellIndex]])
+  )}, [isWin, tdData])
 })
 
 export default Td;
