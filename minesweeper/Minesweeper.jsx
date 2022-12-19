@@ -29,8 +29,9 @@ export const CODE = {
 const initialState = {
   tableData: [],
   timer: 0,
-  result: '',
-  halted: false
+  isWin: false,
+  isHalted: false,
+  opened: 0,
 }
 
 const plantMine = (row, cell, mine) => {
@@ -55,7 +56,7 @@ const plantMine = (row, cell, mine) => {
     const hor = shuffle[k] % cell;
     data[ver][hor] = CODE.MINE;
   }
-  console.log(data);
+  
   return data;
 }
 
@@ -64,13 +65,23 @@ const reducer = (state, action) => {
     case ACTION.START_GAME: 
       return {
         ...state,
+        gameSet: {
+          row: action.row,
+          cell: action.cell,
+          mine: action.mine
+        },
+        opened: 0,
         tableData: plantMine(action.row, action.cell, action.mine),
-        halted: false,
+        isHalted: false,
+        isWin: false,
       }
       
     case ACTION.OPEN_CELL: {
       const tableData = [...state.tableData];
       tableData[action.row] = [...state.tableData[action.row]];
+      let opened = state.opened;
+      let isHalted = false;
+      let isWin = false;
 
       const checkCell = (row, cell) => {
         let around = [];
@@ -94,6 +105,9 @@ const reducer = (state, action) => {
         )
 
         const count = around.filter(v => [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v)).length;
+        if (tableData[row][cell] === CODE.NORMAL) {
+          opened += 1;
+        }
         tableData[row][cell] = count;
 
         if (count === 0) {
@@ -127,9 +141,17 @@ const reducer = (state, action) => {
       }
       checkCell(action.row, action.cell);
 
+      if (opened >= state.gameSet.row * state.gameSet.cell - state.gameSet.mine) {
+        isHalted = true;
+        isWin = true;
+      }
+
       return {
         ...state,
-        tableData
+        tableData,
+        opened,
+        isHalted,
+        isWin
       }
     }
     
@@ -140,7 +162,7 @@ const reducer = (state, action) => {
       return {
         ...state,
         tableData,
-        halted: true
+        isHalted: true
       }
     }
 
@@ -171,8 +193,8 @@ const reducer = (state, action) => {
 
 const Minesweeper = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const {tableData, timer, result, halted} = state;
-  const value = useMemo(() => ({ tableData, dispatch, halted }), [tableData, halted]);
+  const {tableData, timer, isWin, isHalted} = state;
+  const value = useMemo(() => ({ tableData, dispatch, isHalted }), [tableData, isHalted]);
 
   return (
     <tableContext.Provider value={value}>
@@ -180,8 +202,8 @@ const Minesweeper = () => {
       <Form />
       <p>{timer} 초</p>
       <Table />
-      {result && 
-        <p>{result}</p>
+      {isHalted && 
+        <p>{isWin ? '승리했습니다!' : '패배했습니다..'}</p>
       }
     </tableContext.Provider>
   )

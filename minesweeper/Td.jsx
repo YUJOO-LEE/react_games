@@ -50,10 +50,10 @@ const getTdText = (code) => {
 };
 
 const Td = memo(({ trIndex, tdIndex }) => {
-  const { tableData, dispatch, halted } = useContext(tableContext);
+  const { tableData, dispatch, isHalted } = useContext(tableContext);
 
   const onClickTd = useCallback(() => {
-    if (halted) return;
+    if (isHalted) return;
     switch (tableData[trIndex][tdIndex]) {
       case CODE.OPENED:
       case CODE.OPENED_MIND:
@@ -71,11 +71,11 @@ const Td = memo(({ trIndex, tdIndex }) => {
       default:
         return;
     }
-  }, [tableData[trIndex][tdIndex], halted]);
+  }, [tableData[trIndex][tdIndex], isHalted]);
 
   const onRightClickTd = useCallback((e) => {
     e.preventDefault();
-    if (halted) return;
+    if (isHalted) return;
     switch (tableData[trIndex][tdIndex]) {
       case CODE.NORMAL:
       case CODE.MINE:
@@ -90,7 +90,7 @@ const Td = memo(({ trIndex, tdIndex }) => {
       default:
         return;
     }
-  }, [tableData[trIndex][tdIndex], halted]);
+  }, [tableData[trIndex][tdIndex], isHalted]);
   
   return (
     <td
