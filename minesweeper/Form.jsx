@@ -1,7 +1,7 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { memo, useCallback, useContext, useState } from 'react';
 import { ACTION, tableContext } from './Minesweeper';
 
-const Form = () => {
+const Form = memo(() => {
   const [RowLength, setRowLength] = useState(10);
   const [CellLength, setCellLength] = useState(10);
   const [Mine, setMine] = useState(20);
@@ -36,6 +36,6 @@ const Form = () => {
       <button>입력</button>
     </form>
   )
-}
+})
 
 export default Form;

@@ -1,4 +1,4 @@
-import React, { createContext, useMemo, useReducer } from 'react';
+import React, { createContext, useEffect, useMemo, useReducer } from 'react';
 import Form from './Form';
 import Table from './Table';
 
@@ -13,6 +13,7 @@ export const ACTION = {
   CLICK_MINE: 'CLICK_MINE',
   FLAG_QUESTION: 'FLAG_QUESTION',
   NORMALIZE: 'NORMALIZE',
+  SET_TIMER: 'SET_TIMER'
 }
 
 export const CODE = {
@@ -30,7 +31,6 @@ const initialState = {
   tableData: [],
   timer: 0,
   isWin: false,
-  isHalted: false,
   opened: 0,
 }
 
@@ -71,11 +71,18 @@ const reducer = (state, action) => {
           mine: action.mine
         },
         opened: 0,
+        timer: 0,
         tableData: plantMine(action.row, action.cell, action.mine),
         isHalted: false,
         isWin: false,
       }
-      
+    
+    case ACTION.SET_TIMER: 
+      const timer = state.timer + 1;
+      return {
+        ...state,
+        timer
+      }
     case ACTION.OPEN_CELL: {
       const tableData = [...state.tableData];
       tableData[action.row] = [...state.tableData[action.row]];
@@ -196,6 +203,20 @@ const Minesweeper = () => {
   const {tableData, timer, isWin, isHalted} = state;
   const value = useMemo(() => ({ tableData, dispatch, isHalted }), [tableData, isHalted]);
 
+  useEffect(() => {
+    let interval;
+
+    if (isHalted === false) {
+      interval = setInterval(() => {
+        dispatch({ type: ACTION.SET_TIMER })
+      }, 1000);
+    }
+  
+    return () => {
+      clearInterval(interval);
+    }
+  }, [isHalted])
+
   return (
     <tableContext.Provider value={value}>
       <h1>Minesweeper</h1>
@@ -203,7 +224,7 @@ const Minesweeper = () => {
       <p>{timer} 초</p>
       <Table />
       {isHalted && 
-        <p>{isWin ? '승리했습니다!' : '패배했습니다..'}</p>
+        <p>{isWin ? timer + '초만에 승리했습니다!' : '패배했습니다..'}</p>
       }
     </tableContext.Provider>
   )

@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useContext } from 'react';
+import React, { memo, useCallback, useContext, useMemo } from 'react';
 import { ACTION, CODE, tableContext } from './Minesweeper';
 
 const getTdStyle = (code) => {
@@ -92,13 +92,13 @@ const Td = memo(({ trIndex, tdIndex }) => {
     }
   }, [tableData[trIndex][tdIndex], isHalted]);
   
-  return (
+  return useMemo(() => (
     <td
       style={getTdStyle(tableData[trIndex][tdIndex])}
       onClick={onClickTd}
       onContextMenu={onRightClickTd}
     >{getTdText(tableData[trIndex][tdIndex])}</td>
-  )
+  ), [tableData[trIndex][tdIndex]])
 });
 
 export default Td;
