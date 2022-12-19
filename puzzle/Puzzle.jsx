@@ -35,7 +35,6 @@ const setNewGame = (row, cell) => {
 
 const checkWin = (data) => {
   data = data.flat();
-  console.log(data);
   for (let i = 0; i < data.length - 1; i++) {
     if (data[i] !== i + 1) return false;
   };
@@ -55,7 +54,7 @@ const reducer = (state, action) => {
       const tableData = [...state.tableData];
       const curData = tableData[action.row][action.cell];
       let emptyCell;
-      let isWin;
+      let isWin = false;
 
       if (tableData[action.row - 1]?.[action.cell] === 0) { // 위
         emptyCell = [action.row - 1, action.cell]
@@ -89,17 +88,17 @@ const reducer = (state, action) => {
 const Puzzle = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const {tableData, isWin} = state;
-  const value = useMemo(() => ({ tableData, dispatch, isWin }), [tableData]);
+  const value = useMemo(() => ({ tableData, dispatch, isWin }), [tableData, isWin]);
 
   const onClickStart = useCallback(() => {
     dispatch({ type: ACTION.START_GAME });
-  });
+  }, []);
 
   return (
     <tableContext.Provider value={value}>
       <h1>Puzzle</h1>
       <button onClick={onClickStart}>게임시작</button>
-      <Table />
+      <Table tableData={tableData} />
       {isWin && 
         <p>승리!</p>
       }
