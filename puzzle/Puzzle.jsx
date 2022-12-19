@@ -8,6 +8,7 @@ export const tableContext = createContext({
 
 export const ACTION = {
   START_GAME: 'START_GAME',
+  CLICK_CELL: 'CLICK_CELL',
 }
 
 const initialState = {
@@ -40,6 +41,30 @@ const reducer = (state, action) => {
         tableData: setNewGame(4, 4),
       }
 
+    case ACTION.CLICK_CELL:
+      const tableData = [...state.tableData];
+      const curData = tableData[action.row][action.cell];
+      let emptyCell;
+
+      if (tableData[action.row - 1]?.[action.cell] === 0) {
+        emptyCell = [action.row - 1, action.cell]
+      } else if (tableData[action.row + 1]?.[action.cell] === 0) {
+        emptyCell = [action.row + 1, action.cell]
+      } else if (tableData[action.row][action.cell - 1] === 0) {
+        emptyCell = [action.row, action.cell - 1]
+      } else if (tableData[action.row][action.cell + 1] === 0) {
+        emptyCell = [action.row, action.cell + 1]
+      }
+
+      if (emptyCell) {
+        tableData[action.row][action.cell] = tableData[emptyCell[0]][emptyCell[1]];
+        tableData[emptyCell[0]][emptyCell[1]] = curData;
+      }
+
+      return {
+        ...state,
+        tableData
+      }
     default: 
       return state
   }
