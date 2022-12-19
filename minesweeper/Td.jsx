@@ -98,7 +98,7 @@ const Td = memo(({ trIndex, tdIndex }) => {
       onClick={onClickTd}
       onContextMenu={onRightClickTd}
     >{getTdText(tableData[trIndex][tdIndex])}</td>
-  ), [tableData[trIndex][tdIndex]])
+  ), [tableData[trIndex][tdIndex], isHalted])
 });
 
 export default Td;
